@@ -97,3 +97,16 @@ expression `abc` will be formatted with `%d`.  So `{%fmt_str|a $(abc|%d)|}` expa
 an interpolated expression of the form `$(abc|int)` specifies that the
 expression `abc` will be formatted with the Fmt formatter `int`.  So `{%fmt_str|a $(abc|int)|}` expands to
 `Fmt.(str "a %a" int abc)`.
+
+==== interpolated expression without specifier/formatter
+
+an interpolated expression of the form `$(abc)` specifies that the
+expression `abc` will be formatted with `%s`.  So `{%fmt_str|a $(abc)|}` expands to
+`Fmt.(str "a %s" abc)`.
+
+==== A word about whitespace in interpolated expressions
+
+An interpolated expression consists in either two parts (separated by
+'|') or one part (with no '|' present).  In either case,
+leading/trailing whitespace in the parts is ignored/removed before
+further processing.  Internal whitespace is preserved.
