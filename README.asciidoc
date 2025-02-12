@@ -69,4 +69,31 @@ Plain text is anything other than '$'.  To express a '$', double it, viz. '$$'.
 
 === Interpolated expressions
 
-Interpolated expressions are of the form `$(...)`
+The simplest interpolated expression is of the form `$(...)` but all of the following are accepted:
+
+* `$(...)`,  `$(|...|)`
+* `$[...]`,  `$[|...|]`
+* `${...}`,  `${|...|}`
+* `$<...>`,  `$<|...|>`
+
+So basically, '$' followed by any of [ '(', '[', '{', '<' ],
+optionally '|', and then at the end, the matching text.  Between these
+8 forms, it should be possible to enclose any interpolated expression
+without difficulty, I would think.
+
+In the matching text, anything other than the end-string is
+acceptable, and there is no provision made for escaping.
+
+The contents of the interpolated expression can be of three forms:
+
+==== interpolated expression with format-specifier
+
+an interpolated expression of the form `$(abc|%d)` specifies that the
+expression `abc` will be formatted with `%d`.  So `{%fmt_str|a $(abc|%d)|}` expands to
+`Fmt.(str "a %d" abc)`.
+
+==== interpolated expression with Fmt formatter
+
+an interpolated expression of the form `$(abc|int)` specifies that the
+expression `abc` will be formatted with the Fmt formatter `int`.  So `{%fmt_str|a $(abc|int)|}` expands to
+`Fmt.(str "a %a" int abc)`.
