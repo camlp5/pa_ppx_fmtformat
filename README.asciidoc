@@ -57,3 +57,16 @@ Additional Camlp5 directives:
 # let x = [%fmt_str {|a b $(c) d e|}] ;;
 val x : string = "a b argle d e|"
 ```
+
+== Syntax of interpolation text
+
+The contents of the string in `[%fmt_str <string>]` consist in either
+plain text, or interpolated expressions.
+
+=== Plain text
+
+Plain text is anything other than '$'.  To express a '$', double it, viz. '$$'.
+
+=== Interpolated expressions
+
+Interpolated expressions are of the form `$(...)`
