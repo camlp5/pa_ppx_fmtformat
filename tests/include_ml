@@ -1,0 +1,37 @@
+#use "topfind.camlp5";;
+#require "compiler-libs.common" ;;
+#require "camlp-streams";;
+#require "oUnit";;
+#require "fmt";;
+#require "rresult";;
+#require "bos";;
+#require "re";;
+#require "str";;
+
+#require "camlp5.pa_op";;
+Pcaml.inter_phrases := Some ";;\n";;
+(*
+#require "camlp5.pa_r";;
+Pcaml.inter_phrases := Some ";\n";;
+ *)
+
+#require "camlp5.pr_o";;
+
+(*
+#require "camlp5.pr_r";;
+Pcaml.inter_phrases := Some ";\n";;
+ *)
+
+
+(*
+;;; Local Variables: ***
+;;; mode:tuareg ***
+;;; End: ***
+
+*)
+
+#require "camlp5.parser_quotations";;
+#require "pa_ppx.testutils";;
+#require "pa_ppx_fmtformat";;
+open Pa_ppx_testutils.Papr_util ;;
+

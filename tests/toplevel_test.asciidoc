@@ -1,0 +1,102 @@
+`pa_ppx_fmtformat`: what it says on the tin
+===========================================
+:toc:
+:toc-placement: preamble
+
+This package provides two PPX extensions:
+
+`[%fmtformat ...]`::
+
+This can be used anywhere an expression can be used.  The payload must
+be an expression, and that expression will be moved to the top of the
+file (or compilation unit) where it will be assigned a fresh name;
+that name will be used in place of the expression, so that the
+expression will be evaluated only once.  Viz.
+```
+let f s =
+  let re = [%fmtformat Pcre2.exec ~rex s
+```
+
+`[%%fmtformat_preamble ...]`::
+
+This can *only* be used at the first code in a *file* (not in the
+toplevel) (e.g. at top of file, but possibly after comments) and
+provides statements that will precede all the expressions in fmtformat
+blocks.  That is to say (again, only in files), the preamble
+
+```
+[%%fmtformat_preamble open Pcre2]
+```
+could then allow the example above to become
+```
+let f s =
+  let re = [%fmtformat regexp "(a)(b)(c))"] in
+  Pcre2.exec ~rex s
+```
+
+NOTE that the `Pcre2.exec` hasn't changed: we didn't `open Pcre2` for
+the entire file, only for the fmtformat blocks.
+
+== Installation and Invocation
+
+To install this package via opam:
+```
+opam install pa_ppx_fmtformat
+```
+
+to build and install, once `pa_ppx` is installed, `make all test` will do the rest.
+
+=== Usage vla the OCaml compiler
+
+To use this PPX rewriter via the OCaml batch compiler, put your fmtformat declarations 
+
+=== In the OCaml toplevel
+
+```ocaml
+# #use "topfind.camlp5";;
+- : unit = ()
+Findlib has been successfully loaded. Additional directives:
+  #require "package";;      to load a package
+  #list;;                   to list the available packages
+  #camlp4o;;                to load camlp4 (standard syntax)
+  #camlp4r;;                to load camlp4 (revised syntax)
+  #predicates "p,q,...";;   to set these predicates
+  Topfind.reset();;         to force that packages will be reloaded
+  #thread;;                 to enable threads
+
+- : unit = ()
+Additional Camlp5 directives:
+  #camlp5o;;                to load camlp5 (standard syntax)
+  #camlp5r;;                to load camlp5 (revised syntax)
+
+- : unit = ()
+# #camlp5o ;;
+: added to search path
+: added to search path
+: loaded
+: added to search path
+: loaded
+# #require "camlp5.pr_o";;
+# #require "pa_ppx_fmtformat" ;;
+```
+
+== Examples
+
+```ocaml
+# let x = [%fmtformat 2] ;;
+val __fmtformat_0__ : int Pa_ppx_fmtformat_runtime.Fmtformat.t = <abstr>
+val x : int = 2
+```
+
+```ocaml
+# [%fmtformat 1] ;;
+- : int = 1
+```
+
+```ocaml
+# #use "use_test_ml";;
+val __fmtformat_0__ : int Pa_ppx_fmtformat_runtime.Fmtformat.t = <abstr>
+val hd : 'a -> int = <fun>
+- : int = 2
+val x : int = 1
+```
