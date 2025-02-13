@@ -8,8 +8,11 @@ expands into `Fmt`-based code.  So the extension
 
 `[%fmt_str {|a b $(c) d e|}]`
 
-can be used anywhere an expression can be used.  The payload must
-be a string literal.  In that string literal, 
+can be used anywhere an expression can be used.  The payload must be a
+string literal.  In that string literal, OCaml expressions can be
+_interpolated_, and formatting-combinators (in the style of `fmt`) or
+Printf format-specifiers (e.g. `%d`) can be specified along with the
+expressions.  There are copious examples below
 
 == Installation and Invocation
 
@@ -18,7 +21,15 @@ To install this package via opam:
 opam install pa_ppx_fmtformat
 ```
 
-to build and install, once `pa_ppx` is installed, `make sys test` will do the rest.
+to build and test from source:
+```
+opam install pa_ppx
+opam install --deps-only -t .
+```
+and then
+```
+make sys test
+```
 
 === In the OCaml toplevel
 
