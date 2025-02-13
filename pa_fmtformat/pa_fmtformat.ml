@@ -58,9 +58,24 @@ let fmt_str_expr_of_template loc t =
   let e = Expr.applist <:expr< str $str:fmt_string$ >> el in
    <:expr< Fmt.($e$) >>
 
-let rewrite_fmtformat arg = function
+let fmt_pf_expr_of_template loc t =
+  let fmt_string = format_string_of_template t in
+  let el = exprs_of_template t in
+  let e = Expr.applist <:expr< pf pps $str:fmt_string$ >> el in
+   <:expr< fun pps -> Fmt.($e$) >>
+
+let rewrite_fmt_str arg = function
   <:expr:< [%fmt_str $str:s$ ] >> ->
    fmt_str_expr_of_template loc (template_of_string s)
+| <:expr:< [%fmt_str $str:s$ ] >> ->
+   fmt_str_expr_of_template loc (template_of_string s)
+| _ -> assert false
+
+let rewrite_fmt_pf arg = function
+  <:expr:< [%fmt_pf $str:s$ ] >> ->
+   fmt_pf_expr_of_template loc (template_of_string s)
+| <:expr:< [%fmt_pf $str:s$ ] >> ->
+   fmt_pf_expr_of_template loc (template_of_string s)
 | _ -> assert false
 
 let install () = 
@@ -69,7 +84,10 @@ let ef = EF.{ (ef) with
             expr = extfun ef.expr with [
     <:expr:< [%fmt_str $str:_$ ] >> as z ->
     fun arg fallback ->
-      Some (rewrite_fmtformat arg z)
+      Some (rewrite_fmt_str arg z)
+  | <:expr:< [%fmt_pf $str:_$ ] >> as z ->
+    fun arg fallback ->
+      Some (rewrite_fmt_pf arg z)
   ] } in
 
   Pa_passthru.(install { name = "pa_fmtformat"; ef =  ef ; pass = None ; before = [] ; after = [] })
