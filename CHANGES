@@ -2,4 +2,6 @@
 pa_ppx_fmtformat Version 0.01
 -----------------------------
 
-* [12 Feb 2025] start working
+* [12 Feb 2025] start on the package
+
+  OK, it works and there is extensive test-coverage
