@@ -4,11 +4,11 @@
 :toc-placement: preamble
 
 This package provides a PPX extension for string-interplation, that
-expands into `Fmt`-based code.
+expands into `Fmt`-based code.  So the extension
 
-`[%fmt_str {|a b $(c) d e|}]`::
+`[%fmt_str {|a b $(c) d e|}]`
 
-This can be used anywhere an expression can be used.  The payload must
+can be used anywhere an expression can be used.  The payload must
 be a string literal.  In that string literal, 
 
 == Installation and Invocation
