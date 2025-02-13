@@ -159,7 +159,7 @@ end-string is acceptable, and there is no provision made for escaping.
 
 The contents of the interpolated expression can be of three forms:
 
-==== interpolated expression with format-specifier
+==== interpolated expression with format-specifier: `$( <expression> | <format-specifier> )`
 
 an interpolated expression of the form `$(abc|%d)` specifies that the
 expression `abc` will be formatted with `%d`.  So `{%fmt_str|a $(abc|%d)|}` expands to
