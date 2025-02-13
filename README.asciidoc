@@ -54,7 +54,6 @@ Additional Camlp5 directives:
 # #camlp5o ;;
 # #require "camlp5.pr_o";;
 # #require "pa_ppx_fmtformat" ;;
-# #require "ppx_pyformat" ;;
 ```
 
 == Examples
