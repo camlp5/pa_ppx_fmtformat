@@ -25,7 +25,7 @@ TARGET_INSTALL_FILES= $(PACKED_ARCHIVE_TARGET_INSTALL_FILES)
 install:: default_install
 
 clean::
-	rm -rf META
+	rm -rf META interp_lexer.ml
 
 interp_lexer.ml: interp_lexer.mll
 	ocamllex interp_lexer.mll
