@@ -22,8 +22,10 @@ Pcaml.inter_phrases := Some ";\n";;
 Pcaml.inter_phrases := Some ";\n";;
  *)
 
+#require "pa_ppx_static.runtime";;
 #require "pa_ppx_fmtformat";;
 open Pa_ppx_fmtformat ;;
+open Pa_fmtformat ;;
 
 
 (*
