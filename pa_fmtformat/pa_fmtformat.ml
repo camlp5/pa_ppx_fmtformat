@@ -19,6 +19,7 @@ let list_of_lexer_eof eof lexfun lexbuf =
   lrec []
 
 let template_of_string s =
+  let s = Scanf.unescaped s in
   let lb = Lexing.from_string s in
   list_of_lexer_eof EOF Interp_lexer.token lb
 
@@ -48,13 +49,14 @@ let exprs_of_template t =
   | Interpolate(_,arg,Some fmt) when String.get fmt 0 = '%' ->
      [parse_expr arg]
   | Interpolate(_,arg,Some fmt) ->
-     [parse_expr arg; parse_expr fmt]
+     [parse_expr fmt; parse_expr arg]
          )
 
 let fmt_str_expr_of_template loc t =
   let fmt_string = format_string_of_template t in
   let el = exprs_of_template t in
-  Expr.applist <:expr< Fmt.(str $str:fmt_string$) >> el
+  let e = Expr.applist <:expr< str $str:fmt_string$ >> el in
+   <:expr< Fmt.($e$) >>
 
 let rewrite_fmtformat arg = function
   <:expr:< [%fmt_str $str:s$ ] >> ->

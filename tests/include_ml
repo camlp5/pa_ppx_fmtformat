@@ -22,11 +22,20 @@ Pcaml.inter_phrases := Some ";\n";;
 Pcaml.inter_phrases := Some ";\n";;
  *)
 
+#require "pa_ppx.testutils";;
+open Pa_ppx_testutils ;;
+open Papr_util ;;
+open PAPR ;;
+
+
 #require "pa_ppx_static.runtime";;
 #require "pa_ppx_fmtformat";;
 open Pa_ppx_fmtformat ;;
 open Pa_fmtformat ;;
 
+{foo| {%fmt_str|a b c $(c) d e f|} |foo} |> Stream.of_string |> Implem.pa |> Implem.pr |> print_string ;;
+{foo| {%fmt_str|a b c $("argle") d e f|} |foo} |> Stream.of_string |> Implem.pa |> Implem.pr |> print_string ;;
+{foo| {%fmt_str|a b c $("argle"|Dump.string) d e f|} |foo} |> Stream.of_string |> Implem.pa |> Implem.pr |> print_string ;;
 
 (*
 ;;; Local Variables: ***
