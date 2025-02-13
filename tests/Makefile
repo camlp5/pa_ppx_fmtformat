@@ -17,12 +17,6 @@ all: $(TESTS)
 ## NOTE WELL:  toplevel_test.asciidoc.TEST is not being tested (b/c MDX is backlevel)
 test:: all
 	mkdir -p _build && ./pa_ppx_fmtformat_test.exe
-#	$(MAKE) toplevel_test.asciidoc.TEST
-
-toplevel_test.asciidoc.corrected: use_test_ml
-
-toplevel::
-	$(LAUNCH) ocaml -nopromptcont
 
 pa_ppx_fmtformat_test.exe: pa_ppx_fmtformat_test.cmo
 	$(LAUNCH) $(OCAMLFIND) ocamlc -linkall -linkpkg $(OCAMLCFLAGS) -package $(PACKAGES) -linkpkg -linkall -o $@ $<

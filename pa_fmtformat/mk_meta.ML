@@ -14,23 +14,23 @@ Arg.(parse [
 
 Fmt.(pf stdout {|
 # Specifications for the "pa_ppx_fmtformat" preprocessor:
-requires = "camlp5,fmt,pa_ppx.base,pa_ppx_fmtformat_runtime,camlp5.parser_quotations"
+requires = "camlp5,fmt,pa_ppx.base,pa_ppx.utils,pa_ppx_fmtformat_runtime,camlp5.parser_quotations"
 version = "%s"
 description = "pa_ppx_fmtformat: pa_ppx_fmtformat rewriter"
 
 # For linking
 package "link" (
-requires = "camlp5,fmt,pa_ppx.base.link,camlp5.parser_quotations.link"
-archive(byte) = "pa_ppx_fmtformat.cmo"
-archive(native) = "pa_ppx_fmtformat.cmx"
+requires = "camlp5,fmt,pa_ppx.base.link,pa_ppx.utils.link,camlp5.parser_quotations.link"
+archive(byte) = "pa_ppx_fmtformat.cma"
+archive(native) = "pa_ppx_fmtformat.cmxa"
 )
 
 # For the toploop:
-archive(byte,toploop) = "pa_ppx_fmtformat.cmo"
+archive(byte,toploop) = "pa_ppx_fmtformat.cma"
 
   # For the preprocessor itself:
-  requires(syntax,preprocessor) = "camlp5,fmt,pa_ppx.base,camlp5.parser_quotations"
-  archive(syntax,preprocessor,-native) = "pa_ppx_fmtformat.cmo"
-  archive(syntax,preprocessor,native) = "pa_ppx_fmtformat.cmx"
+  requires(syntax,preprocessor) = "camlp5,fmt,pa_ppx.base,pa_ppx.utils,camlp5.parser_quotations"
+  archive(syntax,preprocessor,-native) = "pa_ppx_fmtformat.cma"
+  archive(syntax,preprocessor,native) = "pa_ppx_fmtformat.cmxa"
 
 |} version)

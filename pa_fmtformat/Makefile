@@ -7,27 +7,37 @@ include $(TOP)/config/Makefile.sub
 
 DESTDIR=
 
-PACKAGES := $(PACKAGES),fmt,pa_ppx.base,pa_ppx.deriving_plugins.std
+PACKAGES := $(PACKAGES),fmt,str,pa_ppx.base,pa_ppx.utils,pa_ppx.deriving_plugins.std
 TARGET_PACKAGE = pa_ppx_fmtformat
-
-ML = pa_ppx_fmtformat.ml
-TOOLSML = mk_meta.ml
-ALLSRC=$(ML) $(TOOLSML)
+TARGET = $(TARGET_PACKAGE).cma
+ML = interp_tokens.ml interp_lexer.ml pa_fmtformat.ml
+ALLSRC=$(ML)
 ALLPACKAGES=$(PACKAGES)
 
-all: $(CMO) camlp5.pa_ppx_fmtformat camlp5.pa_ppx_fmtformat.opt META
+OCAMLCFLAGS := $(OCAMLCFLAGS) -for-pack Pa_ppx_fmtformat
+
+all: $(TARGET) $(TARGET:.cma=.cmxa)
 	$(MAKE) DESTDIR=$(WD)/$(TOP)/local-install/ install
 
 doc: $(CMT) $(CMTI)
 
-camlp5.pa_ppx_fmtformat: $(CMO)
-	$(MKCAMLP5) -package fmt,re,camlp5.pa_r,camlp5.pr_r,pa_ppx.base $(CMO) -o $@
-
-camlp5.pa_ppx_fmtformat.opt: $(CMX)
-	$(MKCAMLP5OPT) -package fmt,re,camlp5.pa_r,camlp5.pr_r,pa_ppx.base $(CMX) -o $@
-
-TARGET_INSTALL_FILES=$(FILES_TARGET_INSTALL_FILES)
+TARGET_INSTALL_FILES= $(PACKED_ARCHIVE_TARGET_INSTALL_FILES)
 install:: default_install
 
 clean::
-	rm -rf META camlp5.pa_ppx_fmtformat* mk_meta mk_meta.ml
+	rm -rf META
+
+interp_lexer.ml: interp_lexer.mll
+	ocamllex interp_lexer.mll
+
+$(TARGET_PACKAGE).cmo $(TARGET_PACKAGE).cmi: $(CMO)
+	$(OCAMLFIND) ocamlc $(DEBUG) -pack -o $(TARGET_PACKAGE).cmo $^
+
+$(TARGET_PACKAGE).cmx: $(CMO:.cmo=.cmx)
+	$(OCAMLFIND) ocamlopt $(DEBUG) -pack -o $(TARGET_PACKAGE).cmx $^
+
+$(TARGET): $(TARGET_PACKAGE).cmo
+	$(OCAMLFIND) ocamlc $(DEBUG) $^ -a -o $(TARGET)
+
+$(TARGET:.cma=.cmxa): $(TARGET_PACKAGE).cmx
+	$(OCAMLFIND) ocamlopt $(DEBUG) $^ -a -o $(TARGET:.cma=.cmxa)
