@@ -18,15 +18,18 @@ let list_of_lexer_eof eof lexfun lexbuf =
   in
   lrec []
 
-let template_of_string s =
-  let s = Scanf.unescaped s in
-  let lb = Lexing.from_string s in
-  list_of_lexer_eof EOF Interp_lexer.token lb
+let template_of_string loc orig_s =
+  try
+    let s = Scanf.unescaped orig_s in
+    let lb = Lexing.from_string s in
+    list_of_lexer_eof EOF Interp_lexer.token lb
+  with e ->
+        Fmt.(raise_failwithf loc "pa_fmtformat: while analyzing \"%s\" got exception: %a\n" orig_s exn e)
 
 let format_string_of_template t =
   let l = t |> List.map (function
     EOF -> assert false
-  | Text s -> [%subst "%" / "%%" / g i pcre2] s
+  | Text s -> s |> [%subst "%" / "%%" / g i pcre2] |> [%subst {|\$\$|} / "$" / g i pcre2]
   | Interpolate(_, _, None) -> "%s"
   | Interpolate(_, _, Some fmt) ->
      assert ("" <> fmt) ;
@@ -66,16 +69,16 @@ let fmt_pf_expr_of_template loc t =
 
 let rewrite_fmt_str arg = function
   <:expr:< [%fmt_str $str:s$ ] >> ->
-   fmt_str_expr_of_template loc (template_of_string s)
+   fmt_str_expr_of_template loc (template_of_string loc s)
 | <:expr:< [%fmt_str $str:s$ ] >> ->
-   fmt_str_expr_of_template loc (template_of_string s)
+   fmt_str_expr_of_template loc (template_of_string loc s)
 | _ -> assert false
 
 let rewrite_fmt_pf arg = function
   <:expr:< [%fmt_pf $str:s$ ] >> ->
-   fmt_pf_expr_of_template loc (template_of_string s)
+   fmt_pf_expr_of_template loc (template_of_string loc s)
 | <:expr:< [%fmt_pf $str:s$ ] >> ->
-   fmt_pf_expr_of_template loc (template_of_string s)
+   fmt_pf_expr_of_template loc (template_of_string loc s)
 | _ -> assert false
 
 let install () = 

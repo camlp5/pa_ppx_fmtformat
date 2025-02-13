@@ -19,10 +19,7 @@
 open Lexing
 open Interp_tokens
 
-type error =
-  | Illegal_character of char
-
-exception Error of error * Location.t
+exception Error of string * Location.t
 
 let error lexbuf e = raise (Error(e, Location.curr lexbuf))
 let error_loc loc e = raise (Error(e, loc))
@@ -42,36 +39,54 @@ rule token = parse
   | "$<|" { interp_body_thru_bar_rangle lexbuf }
   | "$<" { interp_body_thru_rangle lexbuf }
 
+  | '$' (eof | [^ '(' '[' '{' '<']) { error lexbuf "Invalid template: Cannot have bare '$' -- use instead '$$'" }
+
   | eof { EOF }
 
 and interp_body_thru_bar_rparen = parse
     (([^ '|' ')'])+ as text) "|" (([^ '|'] | "|" [^ ')'])+ as fmt) "|)" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
   | (([^ '|' ')'])+ as text) "|)" { Interpolate(PAREN_BAR, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '$(|'" }
+  | eof { error lexbuf "Invalid template: Unclosed '$(|'" }
 
 and interp_body_thru_rparen = parse
     (([^ '|' ')'])+ as text) "|" (([^ ')'])+ as fmt) ")" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
   | (([^ '|' ')'])+ as text) ")" { Interpolate(PAREN, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '$('" }
+  | eof { error lexbuf "Invalid template: Unclosed '$('" }
 
 and interp_body_thru_bar_rbracket = parse
     (([^ '|' ']'])+ as text) "|" (([^ '|'] | "|" [^ ']'])+ as fmt) "|]" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
   | (([^ '|' ']'])+ as text) "|]" { Interpolate(PAREN_BAR, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '$[|'" }
+  | eof { error lexbuf "Invalid template: Unclosed '$[|'" }
 
 and interp_body_thru_rbracket = parse
     (([^ '|' ']'])+ as text) "|" (([^ ']'])+ as fmt) "]" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
   | (([^ '|' ']'])+ as text) "]" { Interpolate(PAREN, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '$['" }
+  | eof { error lexbuf "Invalid template: Unclosed '$['" }
 
 and interp_body_thru_bar_rbrace = parse
     (([^ '|' '}'])+ as text) "|" (([^ '|'] | "|" [^ '}'])+ as fmt) "|}" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
   | (([^ '|' '}'])+ as text) "|}" { Interpolate(PAREN_BAR, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '${|'" }
+  | eof { error lexbuf "Invalid template: Unclosed '${|'" }
 
 and interp_body_thru_rbrace = parse
     (([^ '|' '}'])+ as text) "|" (([^ '}'])+ as fmt) "}" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
   | (([^ '|' '}'])+ as text) "}" { Interpolate(PAREN, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '${'" }
+  | eof { error lexbuf "Invalid template: Unclosed '${'" }
 
 and interp_body_thru_bar_rangle = parse
     (([^ '|' '>'])+ as text) "|" (([^ '|'] | "|" [^ '>'])+ as fmt) "|>" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
   | (([^ '|' '>'])+ as text) "|>" { Interpolate(PAREN_BAR, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '$<|'" }
+  | eof { error lexbuf "Invalid template: Unclosed '$<|'" }
 
 and interp_body_thru_rangle = parse
     (([^ '|' '>'])+ as text) "|" (([^ '>'])+ as fmt) ">" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
   | (([^ '|' '>'])+ as text) ">" { Interpolate(PAREN, stripws text, None) }
+  | _ { error lexbuf "Invalid template: Unclosed '$<'" }
+  | eof { error lexbuf "Invalid template: Unclosed '$<'" }

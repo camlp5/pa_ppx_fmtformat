@@ -20,7 +20,7 @@ description = "pa_ppx_fmtformat: pa_ppx_fmtformat rewriter"
 
 # For linking
 package "link" (
-requires = "camlp5,fmt,pa_ppx.base.link,pa_ppx.utils.link,camlp5.parser_quotations.link,pa_ppx_regexp.runtime.link"
+requires = "camlp5,fmt,pa_ppx.base.link,pa_ppx.utils,camlp5.parser_quotations.link,pa_ppx_regexp.runtime"
 archive(byte) = "pa_ppx_fmtformat.cma"
 archive(native) = "pa_ppx_fmtformat.cmxa"
 )
