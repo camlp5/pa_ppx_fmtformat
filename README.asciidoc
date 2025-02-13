@@ -100,8 +100,10 @@ Hello world!
 pi = 3.1415926536
 - : unit = ()
 
+# let pair_formatter = Fmt.(parens (pair ~sep:(const string ", ") string string)) ;;
+val pair_formatter : (string * string) Fmt.t = <fun>
 # let _ =
-  [%fmt_pf {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }@.|}] Fmt.stdout;;
+  [%fmt_pf {|${("foo", "bar")| pair_formatter}@.|}] Fmt.stdout;;
 (foo, bar)
 - : unit = ()
 
@@ -115,6 +117,17 @@ the answer to life the universe and everything 0b10_1010
 # let _ =
   [%fmt_pf "the answer to life the universe and everything ${42|of_to_string (Pp_Bin.make_to_string ~min_width:20 ())}@."] Fmt.stdout ;;
 the answer to life the universe and everything 0b000_0000_0010_1010
+- : unit = ()
+```
+
+Instead of defining a "pair formatter" (to match what `ppx_pyformat`'s
+example does), one can put the complex formatter-code right into the
+interpolated expression.
+
+```ocaml
+# let _ =
+  [%fmt_pf {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }@.|}] Fmt.stdout;;
+(foo, bar)
 - : unit = ()
 ```
 
