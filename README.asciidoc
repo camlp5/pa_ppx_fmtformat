@@ -138,7 +138,18 @@ plain text, or interpolated expressions.
 
 === Plain text
 
-Plain text is anything other than '$'.  To express a '$', double it, viz. '$$'.
+Plain text is anything other than `$`.  To express a `$`, double it,
+viz. `$$`.
+
+One thing to remember is that in `Fmt` format-strings, to emit a
+literal `%`, one typically writes a doubled `%%`.  But since a PPX
+rewriter is managing the entire process, it does the doubling for you:
+you just write:
+
+```ocaml
+# {%fmt_str|%|} ;;
+- : string = "%"
+```
 
 === Interpolated expressions
 
