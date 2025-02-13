@@ -31,6 +31,7 @@ let test_pf ctxt =
 let test_dollar ctxt =
   ()
   ; assert_equal ~printer " $ " {%fmt_str| $$ |}
+  ; assert_equal ~printer " $ % " {%fmt_str| $$ % |}
   ; Testutil.assert_raises_exn_pattern "Invalid template" (fun _ -> Pa_fmtformat.template_of_string Ploc.dummy {| $ |})
   ; Testutil.assert_raises_exn_pattern "Invalid template" (fun _ -> Pa_fmtformat.template_of_string Ploc.dummy {| $( |})
   ; Testutil.assert_raises_exn_pattern "Invalid template" (fun _ -> Pa_fmtformat.template_of_string Ploc.dummy {| $(|})

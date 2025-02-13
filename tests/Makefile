@@ -14,7 +14,6 @@ TESTS=pa_ppx_fmtformat_test.exe
 
 all: $(TESTS)
 
-## NOTE WELL:  toplevel_test.asciidoc.TEST is not being tested (b/c MDX is backlevel)
 test:: all
 	mkdir -p _build && ./pa_ppx_fmtformat_test.exe
 
