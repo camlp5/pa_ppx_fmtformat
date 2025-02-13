@@ -1,4 +1,4 @@
-(**pp -syntax camlp5o -package pa_ppx_fmtformat.link,pa_ppx.testutils *)
+(**pp -syntax camlp5o -package pa_ppx_fmtformat.link *)
 open OUnit2
 open Pa_ppx_testutils
 open Pa_ppx_fmtformat
@@ -15,6 +15,7 @@ let test_str ctxt =
   ; (let c = "argle" in assert_equal ~printer "a b c argle d e f" {%fmt_str|a b c $(|c|) d e f|})
   ; (let c = "argle" in assert_equal ~printer "a b c argle d e f" {%fmt_str|a b c $(|c|string|) d e f|})
   ; (assert_equal ~printer "a b c argle d e f" {%fmt_str|a b c $(|"argle"|string|) d e f|})
+  ; (assert_equal ~printer "0b10_1010" [%fmt_str "${42|of_to_string Pp_binary_ints.Int.to_string}"])
 
 let pp_to_buffer f =
   let buf = Format.stdbuf in

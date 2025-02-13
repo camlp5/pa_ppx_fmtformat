@@ -43,6 +43,7 @@ Additional Camlp5 directives:
 # #camlp5o ;;
 # #require "camlp5.pr_o";;
 # #require "pa_ppx_fmtformat" ;;
+# #require "ppx_pyformat" ;;
 ```
 
 == Examples
@@ -62,6 +63,39 @@ Additional Camlp5 directives:
 - : string = "a b c 3.141500 d e f"
 # {%fmt_str| $$ % |} ;;
 - : string = " $ % "
+```
+
+=== Examples shamelessly cribbed from `ppx_pyformat' (and modified for `pa_ppx_fmtformat`)
+
+```ocaml
+# let _ =
+  let hello = "Hello" in
+  let world = "world" in
+  print_endline [%fmt_str "${hello} ${world}!"] ;;
+Hello world!
+- : unit = ()
+
+# let _ =
+  print_endline [%fmt_str "pi = ${Float.pi|%.10f}"] ;;
+pi = 3.1415926536
+- : unit = ()
+
+# let _ =
+  print_endline [%fmt_str {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }|}; ] ;;
+(foo, bar)
+- : unit = ()
+
+# #require "pp-binary-ints";;
+# module Pp_Bin = Pp_binary_ints.Int;;
+module Pp_Bin = Pp_binary_ints.Int
+# let _ =
+  print_endline [%fmt_str "the answer to life the universe and everything ${42|of_to_string Pp_Bin.to_string}"] ;;
+the answer to life the universe and everything 0b10_1010
+- : unit = ()
+# let _ =
+  print_endline [%fmt_str "the answer to life the universe and everything ${42|of_to_string (Pp_Bin.make_to_string ~min_width:20 ())}"] ;;
+the answer to life the universe and everything 0b000_0000_0010_1010
+- : unit = ()
 ```
 
 == Syntax of interpolation text

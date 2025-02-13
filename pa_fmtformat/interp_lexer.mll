@@ -24,7 +24,9 @@ exception Error of string * Location.t
 let error lexbuf e = raise (Error(e, Location.curr lexbuf))
 let error_loc loc e = raise (Error(e, loc))
 
-let stripws s = Pcre2.(replace ~pat:"[ \n\t]" ~itempl:(subst "") s)
+let strip_leading_ws s = Pcre2.(replace ~pat:"^[ \n\t]+" ~itempl:(subst "") s)
+let strip_trailing_ws s = Pcre2.(replace ~pat:"[ \n\t]+$" ~itempl:(subst "") s)
+let stripws s = s |> strip_leading_ws |> strip_trailing_ws
 }
 
 rule token = parse
