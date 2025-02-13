@@ -81,8 +81,8 @@ optionally '|', and then at the end, the matching text.  Between these
 8 forms, it should be possible to enclose any interpolated expression
 without difficulty, I would think.
 
-In the matching text, anything other than the end-string is
-acceptable, and there is no provision made for escaping.
+In the text surrounded by these delimiter, anything other than the
+end-string is acceptable, and there is no provision made for escaping.
 
 The contents of the interpolated expression can be of three forms:
 
