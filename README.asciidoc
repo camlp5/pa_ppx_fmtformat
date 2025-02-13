@@ -165,13 +165,13 @@ an interpolated expression of the form `$(abc|%d)` specifies that the
 expression `abc` will be formatted with `%d`.  So `{%fmt_str|a $(abc|%d)|}` expands to
 `Fmt.(str "a %d" abc)`.
 
-==== interpolated expression with Fmt formatter
+==== interpolated expression with `Fmt` formatter: `$( <expression> | <Fmt formatter expression> )`
 
 an interpolated expression of the form `$(abc|int)` specifies that the
 expression `abc` will be formatted with the Fmt formatter `int`.  So `{%fmt_str|a $(abc|int)|}` expands to
 `Fmt.(str "a %a" int abc)`.
 
-==== interpolated expression without specifier/formatter
+==== interpolated expression without specifier/formatter: `$( <expression> )`
 
 an interpolated expression of the form `$(abc)` specifies that the
 expression `abc` will be formatted with `%s`.  So `{%fmt_str|a $(abc)|}` expands to
