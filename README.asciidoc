@@ -48,6 +48,8 @@ Additional Camlp5 directives:
 
 == Examples
 
+First, some simple examples generating strings:
+
 ```ocaml
 # let c = "argle" in [%fmt_str {|a b $(c) d e|}] ;;
 - : string = "a b argle d e"
@@ -65,23 +67,31 @@ Additional Camlp5 directives:
 - : string = " $ % "
 ```
 
+And then to stdout:
+
+```ocaml
+# {%fmt_pf|a b c $("argle") d e f@.|} Fmt.stdout ;;
+a b c argle d e f
+- : unit = ()
+```
+
 === Examples shamelessly cribbed from `ppx_pyformat' (and modified for `pa_ppx_fmtformat`)
 
 ```ocaml
 # let _ =
   let hello = "Hello" in
   let world = "world" in
-  print_endline [%fmt_str "${hello} ${world}!"] ;;
+  [%fmt_pf "${hello} ${world}!@."] Fmt.stdout ;;
 Hello world!
 - : unit = ()
 
 # let _ =
-  print_endline [%fmt_str "pi = ${Float.pi|%.10f}"] ;;
+  [%fmt_pf "pi = ${Float.pi|%.10f}@."] Fmt.stdout ;;
 pi = 3.1415926536
 - : unit = ()
 
 # let _ =
-  print_endline [%fmt_str {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }|}; ] ;;
+  [%fmt_pf {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }@.|}] Fmt.stdout;;
 (foo, bar)
 - : unit = ()
 
@@ -89,11 +99,11 @@ pi = 3.1415926536
 # module Pp_Bin = Pp_binary_ints.Int;;
 module Pp_Bin = Pp_binary_ints.Int
 # let _ =
-  print_endline [%fmt_str "the answer to life the universe and everything ${42|of_to_string Pp_Bin.to_string}"] ;;
+  [%fmt_pf "the answer to life the universe and everything ${42|of_to_string Pp_Bin.to_string}@."] Fmt.stdout ;;
 the answer to life the universe and everything 0b10_1010
 - : unit = ()
 # let _ =
-  print_endline [%fmt_str "the answer to life the universe and everything ${42|of_to_string (Pp_Bin.make_to_string ~min_width:20 ())}"] ;;
+  [%fmt_pf "the answer to life the universe and everything ${42|of_to_string (Pp_Bin.make_to_string ~min_width:20 ())}@."] Fmt.stdout ;;
 the answer to life the universe and everything 0b000_0000_0010_1010
 - : unit = ()
 ```
