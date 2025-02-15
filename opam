@@ -26,6 +26,7 @@ depends: [
   "fmt"
   "mdx" { >= "2.3.0" & with-test}
   "pp-binary-ints" {with-test}
+  "pa_ppx_regexp"
 ]
 build: [
   [make "sys"]
