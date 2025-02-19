@@ -1,4 +1,4 @@
-(**pp -syntax camlp5o -package pa_ppx_fmtformat.link *)
+(**pp -syntax camlp5o -package pa_ppx_fmtformat *)
 open OUnit2
 open Pa_ppx_testutils
 open Pa_ppx_fmtformat
@@ -17,6 +17,7 @@ let test_str ctxt =
   ; (assert_equal ~printer "a b c argle d e f" {%fmt_str|a b c $(|"argle"|string|) d e f|})
   ; (assert_equal ~printer "0b10_1010" [%fmt_str "${42|of_to_string Pp_binary_ints.Int.to_string}"])
 
+
 let pp_to_buffer f =
   let buf = Format.stdbuf in
   Buffer.clear buf ;
@@ -28,6 +29,7 @@ let test_pf ctxt =
   ()
   ; assert_equal "" (pp_to_buffer [%fmt_pf ""])
   ; (assert_equal ~printer "a b c argle d e f" (pp_to_buffer {%fmt_pf|a b c $("argle") d e f|}))
+  ; assert_equal ~printer:(fun x -> "<<"^x^">>") "(foo, bar)\n" (pp_to_buffer [%fmt_pf {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }@.|}])
 
 let test_dollar ctxt =
   ()
@@ -37,11 +39,18 @@ let test_dollar ctxt =
   ; Testutil.assert_raises_exn_pattern "Invalid template" (fun _ -> Pa_fmtformat.template_of_string Ploc.dummy {| $( |})
   ; Testutil.assert_raises_exn_pattern "Invalid template" (fun _ -> Pa_fmtformat.template_of_string Ploc.dummy {| $(|})
   ; Testutil.assert_raises_exn_pattern "Invalid template" (fun _ -> Pa_fmtformat.template_of_string Ploc.dummy {| $(|foo|})
+  ; Testutil.assert_raises_exn_pattern "Invalid template" (fun _ -> Pa_fmtformat.template_of_string Ploc.dummy {| $(|")"|string|) |})
+
+let test_location_accuracy ctxt =
+  let loc = Ploc.make_unlined (10, 10) in
+  ()
+  ; assert_equal ~printer " $ " {%fmt_str| $$ |}
 
 let suite = "Test pa_ppx_fmtformat" >::: [
       "str"   >:: test_str
     ; "pf"   >:: test_pf
     ; "dollar"   >:: test_dollar
+    ; "location accuracy"   >:: test_location_accuracy
     ]
 
 let _ = 

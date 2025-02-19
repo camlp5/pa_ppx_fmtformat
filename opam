@@ -19,14 +19,14 @@ depends: [
   "ocaml"       { >= "4.10.0" }
   "camlp5-buildscripts" { >= "0.02" }
   "camlp5"      { >= "8.01.00" }
-  "pcre2" { with-test }
+  "pcre2" { >= "8.0.3" }
   "pa_ppx"      { >= "0.12" }
-  "not-ocamlfind" { >= "0.10" }
+  "not-ocamlfind" { >= "0.13" }
   "ounit" { >= "2.2.7" }
   "fmt"
   "mdx" { >= "2.3.0" & with-test}
   "pp-binary-ints" {with-test}
-  "pa_ppx_regexp"
+  "pa_ppx_regexp" { >= "0.04" }
 ]
 build: [
   [make "sys"]

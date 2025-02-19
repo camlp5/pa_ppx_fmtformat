@@ -27,11 +27,13 @@ let error_loc loc e = raise (Error(e, loc))
 let strip_leading_ws s = Pcre2.(replace ~pat:"^[ \n\t]+" ~itempl:(subst "") s)
 let strip_trailing_ws s = Pcre2.(replace ~pat:"[ \n\t]+$" ~itempl:(subst "") s)
 let stripws s = s |> strip_leading_ws |> strip_trailing_ws
+
+let location ~subtract_end lexbuf = (Lexing.lexeme_start lexbuf, (Lexing.lexeme_end lexbuf) - subtract_end)
 }
 
 rule token = parse
   | ([^ '$'] | "$$") +
-      { Text (Lexing.lexeme lexbuf) }
+      { (location ~subtract_end:0 lexbuf, Text (Lexing.lexeme lexbuf)) }
   | "$(|" { interp_body_thru_bar_rparen lexbuf }
   | "$(" { interp_body_thru_rparen lexbuf }
   | "$[|" { interp_body_thru_bar_rbracket lexbuf }
@@ -43,52 +45,68 @@ rule token = parse
 
   | '$' (eof | [^ '(' '[' '{' '<']) { error lexbuf "Invalid template: Cannot have bare '$' -- use instead '$$'" }
 
-  | eof { EOF }
+  | eof { (location ~subtract_end:0 lexbuf, EOF) }
 
 and interp_body_thru_bar_rparen = parse
-    (([^ '|' ')'])+ as text) "|" (([^ '|'] | "|" [^ ')'])+ as fmt) "|)" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
-  | (([^ '|' ')'])+ as text) "|)" { Interpolate(PAREN_BAR, stripws text, None) }
+    (([^ '|' ')'])+ as text) "|" (([^ '|'] | "|" [^ ')'])+ as fmt) "|)"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, Some (stripws fmt))) }
+  | (([^ '|' ')'])+ as text) "|)"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '$(|'" }
   | eof { error lexbuf "Invalid template: Unclosed '$(|'" }
 
 and interp_body_thru_rparen = parse
-    (([^ '|' ')'])+ as text) "|" (([^ ')'])+ as fmt) ")" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
-  | (([^ '|' ')'])+ as text) ")" { Interpolate(PAREN, stripws text, None) }
+    (([^ '|' ')'])+ as text) "|" (([^ ')'])+ as fmt) ")"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, Some (stripws fmt))) }
+  | (([^ '|' ')'])+ as text) ")"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '$('" }
   | eof { error lexbuf "Invalid template: Unclosed '$('" }
 
 and interp_body_thru_bar_rbracket = parse
-    (([^ '|' ']'])+ as text) "|" (([^ '|'] | "|" [^ ']'])+ as fmt) "|]" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
-  | (([^ '|' ']'])+ as text) "|]" { Interpolate(PAREN_BAR, stripws text, None) }
+    (([^ '|' ']'])+ as text) "|" (([^ '|'] | "|" [^ ']'])+ as fmt) "|]"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, Some (stripws fmt))) }
+  | (([^ '|' ']'])+ as text) "|]"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '$[|'" }
   | eof { error lexbuf "Invalid template: Unclosed '$[|'" }
 
 and interp_body_thru_rbracket = parse
-    (([^ '|' ']'])+ as text) "|" (([^ ']'])+ as fmt) "]" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
-  | (([^ '|' ']'])+ as text) "]" { Interpolate(PAREN, stripws text, None) }
+    (([^ '|' ']'])+ as text) "|" (([^ ']'])+ as fmt) "]"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, Some (stripws fmt))) }
+  | (([^ '|' ']'])+ as text) "]"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '$['" }
   | eof { error lexbuf "Invalid template: Unclosed '$['" }
 
 and interp_body_thru_bar_rbrace = parse
-    (([^ '|' '}'])+ as text) "|" (([^ '|'] | "|" [^ '}'])+ as fmt) "|}" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
-  | (([^ '|' '}'])+ as text) "|}" { Interpolate(PAREN_BAR, stripws text, None) }
+    (([^ '|' '}'])+ as text) "|" (([^ '|'] | "|" [^ '}'])+ as fmt) "|}"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, Some (stripws fmt))) }
+  | (([^ '|' '}'])+ as text) "|}"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '${|'" }
   | eof { error lexbuf "Invalid template: Unclosed '${|'" }
 
 and interp_body_thru_rbrace = parse
-    (([^ '|' '}'])+ as text) "|" (([^ '}'])+ as fmt) "}" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
-  | (([^ '|' '}'])+ as text) "}" { Interpolate(PAREN, stripws text, None) }
+    (([^ '|' '}'])+ as text) "|" (([^ '}'])+ as fmt) "}"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, Some (stripws fmt))) }
+  | (([^ '|' '}'])+ as text) "}"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '${'" }
   | eof { error lexbuf "Invalid template: Unclosed '${'" }
 
 and interp_body_thru_bar_rangle = parse
-    (([^ '|' '>'])+ as text) "|" (([^ '|'] | "|" [^ '>'])+ as fmt) "|>" { Interpolate(PAREN_BAR, stripws text, Some (stripws fmt)) }
-  | (([^ '|' '>'])+ as text) "|>" { Interpolate(PAREN_BAR, stripws text, None) }
+    (([^ '|' '>'])+ as text) "|" (([^ '|'] | "|" [^ '>'])+ as fmt) "|>"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, Some (stripws fmt))) }
+  | (([^ '|' '>'])+ as text) "|>"
+    { (location ~subtract_end:2 lexbuf, Interpolate(PAREN_BAR, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '$<|'" }
   | eof { error lexbuf "Invalid template: Unclosed '$<|'" }
 
 and interp_body_thru_rangle = parse
-    (([^ '|' '>'])+ as text) "|" (([^ '>'])+ as fmt) ">" { Interpolate(PAREN, stripws text, Some (stripws fmt)) }
-  | (([^ '|' '>'])+ as text) ">" { Interpolate(PAREN, stripws text, None) }
+    (([^ '|' '>'])+ as text) "|" (([^ '>'])+ as fmt) ">"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, Some (stripws fmt))) }
+  | (([^ '|' '>'])+ as text) ">"
+    { (location ~subtract_end:1 lexbuf, Interpolate(PAREN, stripws text, None)) }
   | _ { error lexbuf "Invalid template: Unclosed '$<'" }
   | eof { error lexbuf "Invalid template: Unclosed '$<'" }

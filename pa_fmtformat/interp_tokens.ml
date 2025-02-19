@@ -14,3 +14,5 @@ type token =
   Text of string
 | Interpolate of paren_kind_t * string * string option
 | EOF
+
+type template_t = ((int * int) * token) list
