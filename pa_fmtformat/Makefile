@@ -7,7 +7,7 @@ include $(TOP)/config/Makefile.sub
 
 DESTDIR=
 
-PACKAGES := $(PACKAGES),fmt,pcre2,str,pa_ppx.base,pa_ppx.utils,pa_ppx.deriving_plugins.std
+PACKAGES := $(PACKAGES),fmt,pcre2,str,pa_ppx.base,pa_ppx.utils,pa_ppx.deriving_plugins.std,pa_ppx_regexp
 TARGET_PACKAGE = pa_ppx_fmtformat
 TARGET = $(TARGET_PACKAGE).cma
 ML = interp_tokens.ml interp_lexer.ml pa_fmtformat.ml

@@ -8,7 +8,7 @@ open Pa_ppx_utils
 open Pa_passthru
 open Ppxutil
 open Interp_tokens
-
+ 
 let list_of_lexer_eof eof lexfun lexbuf =
   let rec lrec acc =
     let tok = lexfun lexbuf in
@@ -25,24 +25,12 @@ let template_of_string loc s =
   with e ->
         Fmt.(raise_failwithf loc "pa_fmtformat: while analyzing \"%s\" got exception: %a\n" s exn e)
 
-(*
-let template_of_string loc orig_s =
-  try
-    let lb = Lexing.from_string orig_s in
-    let l = list_of_lexer_eof EOF Interp_lexer.token lb in
-    l |> List.map (function
-               Text s -> Text (Scanf.unescaped s)
-             | Interpolate (p, s, fo) -> Interpolate (p, Scanf.unescaped s, Option.map Scanf.unescaped fo))
-  with e ->
-        Fmt.(raise_failwithf loc "pa_fmtformat: while analyzing \"%s\" got exception: %a\n" orig_s exn e)
- *)
-
 let format_string_of_template t =
   let l = t |> List.map (function
     EOF -> assert false
   | Text s -> s |> [%subst "%" / "%%" / g i pcre2] |> [%subst {|\$\$|} / "$" / g i pcre2]
   | Interpolate(_, _, None) -> "%s"
-  | Interpolate(_, _, Some fmt) ->
+  | Interpolate(_, _, Some (_, fmt)) ->
      assert ("" <> fmt) ;
      if String.get fmt 0 = '%' then
        fmt
@@ -90,17 +78,17 @@ let parse_expr loc str =
   Reloc.expr (fun subloc -> reloc_to_subloc ~enclosed:loc subloc) shift e
 
 let exprs_of_template loc t =
-  t |> List.concat_map (fun ((bp, ep), tok) ->
-    let loc = Ploc.sub loc bp (ep-bp) in
+  t |> List.concat_map (fun (pos, tok) ->
+    let mkloc (bp, ep) = Ploc.sub loc bp (ep-bp) in
     match tok with
       EOF -> assert false
     | Text s -> []
-    | Interpolate(_,arg,None) ->
-       [parse_expr loc arg]
-    | Interpolate(_,arg,Some fmt) when String.get fmt 0 = '%' ->
-       [parse_expr loc arg]
-    | Interpolate(_,arg,Some fmt) ->
-       [parse_expr loc fmt; parse_expr loc arg]
+    | Interpolate(_,(argpos,arg),None) ->
+       [parse_expr (mkloc argpos) arg]
+    | Interpolate(_,(argpos,arg),Some (_,fmt)) when String.get fmt 0 = '%' ->
+       [parse_expr (mkloc argpos) arg]
+    | Interpolate(_,(argpos,arg),Some (fmtpos,fmt)) ->
+       [parse_expr (mkloc fmtpos) fmt; parse_expr (mkloc argpos) arg]
          )
 
 let fmt_str_expr_of_template loc t =
