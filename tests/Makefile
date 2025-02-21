@@ -23,7 +23,7 @@ pa_ppx_fmtformat_test.exe: pa_ppx_fmtformat_test.cmo
 	$(LAUNCH) $(OCAMLFIND) ocamlc -linkall -linkpkg $(OCAMLCFLAGS) -package $(PACKAGES) -linkpkg -linkall -o $@ $<
 
 machinery_test.exe: machinery_test.cmo
-	$(LAUNCH) $(OCAMLFIND) ocamlc -linkall -linkpkg $(OCAMLCFLAGS) -package $(PACKAGES) -linkpkg -linkall -o $@ $<
+	$(LAUNCH) $(OCAMLFIND) ocamlc -linkall -linkpkg $(OCAMLCFLAGS) -package $(PACKAGES),camlp5.pa_o.link,camlp5.pr_o.link -linkpkg -linkall -o $@ $<
 
 clean::
 	rm -rf *.cm* _build *.exe
