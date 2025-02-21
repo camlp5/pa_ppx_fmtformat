@@ -80,6 +80,9 @@ let test_expr_locations ctxt =
 ; assert_equal ~printer
     [((10, 11), "#<expr< b >>"); ((6, 7), "#<expr< a >>")]
     (to_exprs {|abc$( a | b )|})
+; assert_equal ~printer
+    [((11, 12), "#<expr< b >>"); ((7, 8), "#<expr< a >>")]
+    (to_exprs {|abc$(| a | b |)|})
 
 let suite = "Test machinery" >::: [
       "lexer"   >:: test_lexer
