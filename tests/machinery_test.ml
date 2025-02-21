@@ -56,7 +56,7 @@ let test_lexer ctxt =
       ]
       (template_of_string Ploc.dummy {|a $( b | x ) c|})
 
-let suite = "Test interp_lexer" >::: [
+let suite = "Test machinery" >::: [
       "lexer"   >:: test_lexer
     ]
 
