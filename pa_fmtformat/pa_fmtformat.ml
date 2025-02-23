@@ -104,21 +104,17 @@ let fmt_pf_expr_of_template loc t =
    <:expr< fun pps -> Fmt.($e$) >>
 
 let rewrite_fmt_str arg = function
-  <:expr:< [%fmt_str $exp:e$ ] >> ->
-   let (loc, s) = match e with <:expr:< $str:s$ >> -> (loc, s) in
+  <:expr< [%fmt_str $exp:e$ ] >> ->
+   let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
    fmt_str_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
-| <:expr:< [%fmt_str $exp:e$ ] >> ->
-   let (loc, s) = match e with <:expr:< $str:s$ >> -> (loc, s) in
-   fmt_str_expr_of_template loc (template_of_string loc s)
+
 | _ -> assert false
 
 let rewrite_fmt_pf arg = function
-  <:expr:< [%fmt_pf $exp:e$ ] >> ->
-   let (loc, s) = match e with <:expr:< $str:s$ >> -> (loc, s) in
+  <:expr< [%fmt_pf $exp:e$ ] >> ->
+   let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
    fmt_pf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
-| <:expr:< [%fmt_pf $exp:e$ ] >> ->
-   let (loc, s) = match e with <:expr:< $str:s$ >> -> (loc, s) in
-   fmt_pf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+
 | _ -> assert false
 
 let install () = 
