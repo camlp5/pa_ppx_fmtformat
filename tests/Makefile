@@ -15,9 +15,11 @@ TESTS=pa_ppx_fmtformat_test.exe machinery_test.exe
 
 all: $(TESTS)
 
-test:: all
+test:: all mdx-test
 	mkdir -p _build && ./pa_ppx_fmtformat_test.exe
 	mkdir -p _build && ./machinery_test.exe
+
+mdx-test:: error-handling.asciidoc.TEST
 
 pa_ppx_fmtformat_test.exe: pa_ppx_fmtformat_test.cmo
 	$(LAUNCH) $(OCAMLFIND) ocamlc -linkall -linkpkg $(OCAMLCFLAGS) -package $(PACKAGES) -linkpkg -linkall -o $@ $<
