@@ -77,11 +77,18 @@ First, some simple examples generating strings:
 - : string = " $ % "
 ```
 
-And then to stdout:
+And then to stdout.  Notice that the generated function has type `unit
+Fmt.t` so it can be used directly in further invocations.
 
 ```ocaml
-# {%fmt_pf|a b c $("argle") d e f@.|} Fmt.stdout ;;
+# {%fmt_pf|a b c $("argle") d e f@.|} Fmt.stdout () ;;
 a b c argle d e f
+- : unit = ()
+# let f = {%fmt_pf|a b c $("argle") d e f@.|} ;;
+val f : Format.formatter -> unit -> unit = <fun>
+# Fmt.(pf stdout "here: %a@." f ()) ;;
+here: a b c argle d e f
+
 - : unit = ()
 ```
 
@@ -91,19 +98,19 @@ a b c argle d e f
 # let _ =
   let hello = "Hello" in
   let world = "world" in
-  [%fmt_pf "${hello} ${world}!@."] Fmt.stdout ;;
+  [%fmt_pf "${hello} ${world}!@."] Fmt.stdout () ;;
 Hello world!
 - : unit = ()
 
 # let _ =
-  [%fmt_pf "pi = ${Float.pi|%.10f}@."] Fmt.stdout ;;
+  [%fmt_pf "pi = ${Float.pi|%.10f}@."] Fmt.stdout () ;;
 pi = 3.1415926536
 - : unit = ()
 
 # let pair_formatter = Fmt.(parens (pair ~sep:(const string ", ") string string)) ;;
 val pair_formatter : (string * string) Fmt.t = <fun>
 # let _ =
-  [%fmt_pf {|${("foo", "bar")| pair_formatter}@.|}] Fmt.stdout;;
+  [%fmt_pf {|${("foo", "bar")| pair_formatter}@.|}] Fmt.stdout ();;
 (foo, bar)
 - : unit = ()
 
@@ -111,11 +118,11 @@ val pair_formatter : (string * string) Fmt.t = <fun>
 # module Pp_Bin = Pp_binary_ints.Int;;
 module Pp_Bin = Pp_binary_ints.Int
 # let _ =
-  [%fmt_pf "the answer to life the universe and everything ${42|of_to_string Pp_Bin.to_string}@."] Fmt.stdout ;;
+  [%fmt_pf "the answer to life the universe and everything ${42|of_to_string Pp_Bin.to_string}@."] Fmt.stdout () ;;
 the answer to life the universe and everything 0b10_1010
 - : unit = ()
 # let _ =
-  [%fmt_pf "the answer to life the universe and everything ${42|of_to_string (Pp_Bin.make_to_string ~min_width:20 ())}@."] Fmt.stdout ;;
+  [%fmt_pf "the answer to life the universe and everything ${42|of_to_string (Pp_Bin.make_to_string ~min_width:20 ())}@."] Fmt.stdout () ;;
 the answer to life the universe and everything 0b000_0000_0010_1010
 - : unit = ()
 ```
@@ -126,7 +133,7 @@ interpolated expression.
 
 ```ocaml
 # let _ =
-  [%fmt_pf {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }@.|}] Fmt.stdout;;
+  [%fmt_pf {|${("foo", "bar")| parens (pair ~sep:(const string ", ") string string) }@.|}] Fmt.stdout () ;;
 (foo, bar)
 - : unit = ()
 ```

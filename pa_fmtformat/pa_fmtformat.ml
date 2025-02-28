@@ -101,7 +101,7 @@ let fmt_pf_expr_of_template loc t =
   let fmt_string = t |> List.map snd |> format_string_of_template in
   let el = exprs_of_template loc t in
   let e = Expr.applist <:expr< pf pps $str:fmt_string$ >> el in
-   <:expr< fun pps -> Fmt.($e$) >>
+   <:expr< fun pps () -> Fmt.($e$) >>
 
 let rewrite_fmt_str arg = function
   <:expr< [%fmt_str $exp:e$ ] >> ->

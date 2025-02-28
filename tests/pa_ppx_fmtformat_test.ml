@@ -21,7 +21,7 @@ let test_str ctxt =
 let pp_to_buffer f =
   let buf = Format.stdbuf in
   Buffer.clear buf ;
-  f Format.str_formatter ;
+  f Format.str_formatter () ;
   Format.flush_str_formatter ()
 
 
