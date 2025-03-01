@@ -46,11 +46,18 @@ let test_location_accuracy ctxt =
   ()
   ; assert_equal ~printer " $ " {%fmt_str| $$ |}
 
+let test_sprintf ctxt =
+  ()
+  ; assert_equal "foo" {%sprintf|foo|}
+  ; assert_equal "foo42" {%sprintf|foo$(42|%d)|}
+  ; assert_equal "foo42(abc)" {%sprintf|foo$(42|int)$("abc"|parens string)|}
+
 let suite = "Test pa_ppx_fmtformat" >::: [
       "str"   >:: test_str
     ; "pf"   >:: test_pf
     ; "dollar"   >:: test_dollar
     ; "location accuracy"   >:: test_location_accuracy
+    ; "test sprintf" >:: test_sprintf
     ]
 
 let _ = 

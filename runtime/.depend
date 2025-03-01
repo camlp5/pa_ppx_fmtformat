@@ -1,3 +1,8 @@
-runtime.cmo runtime.cmi runtime.cmx: 
-runtime.cmo :
-runtime.cmx :
+pa_ppx_fmtformat_runtime.cmo pa_ppx_fmtformat_runtime.cmi pa_ppx_fmtformat_runtime.cmx: 
+pa_ppx_fmtformat_runtime.cmo : \
+    pa_ppx_fmtformat_runtime.cmi
+pa_ppx_fmtformat_runtime.cmx : \
+    pa_ppx_fmtformat_runtime.cmi
+pa_ppx_fmtformat_runtime.cmi :
+mk_meta.cmo :
+mk_meta.cmx :

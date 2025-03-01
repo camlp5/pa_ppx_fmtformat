@@ -25,7 +25,7 @@ let template_of_string loc s =
   with e ->
         Fmt.(raise_failwithf loc "pa_fmtformat: while analyzing \"%s\" got exception: %a\n" s exn e)
 
-let format_string_of_template t =
+let format_string_of_template ~forfmt t =
   let l = t |> List.map (function
     EOF -> assert false
   | Text s -> s |> [%subst "%" / "%%" / g i pcre2] |> [%subst {|\$\$|} / "$" / g i pcre2]
@@ -34,7 +34,7 @@ let format_string_of_template t =
      assert ("" <> fmt) ;
      if String.get fmt 0 = '%' then
        fmt
-     else "%a"
+     else if forfmt then "%a" else "%a"
                  ) in
   String.concat "" l
 
@@ -92,16 +92,10 @@ let exprs_of_template loc t =
          )
 
 let fmt_str_expr_of_template loc t =
-  let fmt_string = t |> List.map snd |> format_string_of_template in
+  let fmt_string = t |> List.map snd |> format_string_of_template ~forfmt:true in
   let el = exprs_of_template loc t in
   let e = Expr.applist <:expr< str $str:fmt_string$ >> el in
    <:expr< Fmt.($e$) >>
-
-let fmt_pf_expr_of_template loc t =
-  let fmt_string = t |> List.map snd |> format_string_of_template in
-  let el = exprs_of_template loc t in
-  let e = Expr.applist <:expr< pf pps $str:fmt_string$ >> el in
-   <:expr< fun pps () -> Fmt.($e$) >>
 
 let rewrite_fmt_str arg = function
   <:expr< [%fmt_str $exp:e$ ] >> ->
@@ -110,10 +104,81 @@ let rewrite_fmt_str arg = function
 
 | _ -> assert false
 
+let fmt_pf_expr_of_template loc t =
+  let fmt_string = t |> List.map snd |> format_string_of_template ~forfmt:true in
+  let el = exprs_of_template loc t in
+  let e = Expr.applist <:expr< pf pps $str:fmt_string$ >> el in
+   <:expr< fun pps () -> Fmt.($e$) >>
+
 let rewrite_fmt_pf arg = function
   <:expr< [%fmt_pf $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
    fmt_pf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+
+| _ -> assert false
+
+let sprintf_expr_of_template loc t =
+  let fmt_string = t |> List.map snd |> format_string_of_template ~forfmt:false in
+  let el = exprs_of_template loc t in
+  let e = Expr.applist <:expr< sprintf $str:fmt_string$ >> el in
+   <:expr< Pa_ppx_fmtformat_runtime.Sfmt.($e$) >>
+
+let rewrite_sprintf arg = function
+  <:expr< [%sprintf $exp:e$ ] >> ->
+   let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
+   sprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+
+| _ -> assert false
+
+let fprintf_expr_of_template loc t =
+  let fmt_string = t |> List.map snd |> format_string_of_template ~forfmt:false in
+  let el = exprs_of_template loc t in
+  let e = Expr.applist <:expr< fprintf pps $str:fmt_string$ >> el in
+   <:expr< fun pps -> Pa_ppx_fmtformat_runtime.Pfmt.($e$) >>
+
+let rewrite_fprintf arg = function
+  <:expr< [%fprintf $exp:e$ ] >> ->
+   let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
+   fprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+
+| _ -> assert false
+
+let printf_expr_of_template loc t =
+  let fmt_string = t |> List.map snd |> format_string_of_template ~forfmt:false in
+  let el = exprs_of_template loc t in
+  let e = Expr.applist <:expr< printf $str:fmt_string$ >> el in
+   <:expr< Pa_ppx_fmtformat_runtime.Pfmt.($e$) >>
+
+let rewrite_printf arg = function
+  <:expr< [%printf $exp:e$ ] >> ->
+   let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
+   printf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+
+| _ -> assert false
+
+let sub_sprintf_expr_of_template loc t =
+  let fmt_string = t |> List.map snd |> format_string_of_template ~forfmt:false in
+  let el = exprs_of_template loc t in
+  let e = Expr.applist <:expr< sprintf $str:fmt_string$ >> el in
+   <:expr< fun () () -> Pa_ppx_fmtformat_runtime.Sfmt.($e$) >>
+
+let rewrite_sub_sprintf arg = function
+  <:expr< [%sub_sprintf $exp:e$ ] >> ->
+   let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
+   sub_sprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+
+| _ -> assert false
+
+let sub_fprintf_expr_of_template loc t =
+  let fmt_string = t |> List.map snd |> format_string_of_template ~forfmt:false in
+  let el = exprs_of_template loc t in
+  let e = Expr.applist <:expr< fprintf pps $str:fmt_string$ >> el in
+   <:expr< fun pps () -> Pa_ppx_fmtformat_runtime.Pfmt.($e$) >>
+
+let rewrite_sub_fprintf arg = function
+  <:expr< [%sub_fprintf $exp:e$ ] >> ->
+   let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
+   sub_fprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
 
 | _ -> assert false
 
@@ -127,6 +192,21 @@ let ef = EF.{ (ef) with
   | <:expr:< [%fmt_pf $str:_$ ] >> as z ->
     fun arg fallback ->
       Some (rewrite_fmt_pf arg z)
+  | <:expr:< [%sprintf $str:_$ ] >> as z ->
+    fun arg fallback ->
+      Some (rewrite_sprintf arg z)
+  | <:expr:< [%fprintf $str:_$ ] >> as z ->
+    fun arg fallback ->
+      Some (rewrite_fprintf arg z)
+  | <:expr:< [%printf $str:_$ ] >> as z ->
+    fun arg fallback ->
+      Some (rewrite_printf arg z)
+  | <:expr:< [%sub_sprintf $str:_$ ] >> as z ->
+    fun arg fallback ->
+      Some (rewrite_sub_sprintf arg z)
+  | <:expr:< [%sub_fprintf $str:_$ ] >> as z ->
+    fun arg fallback ->
+      Some (rewrite_sub_fprintf arg z)
   ] } in
 
   Pa_passthru.(install { name = "pa_fmtformat"; ef =  ef ; pass = None ; before = [] ; after = [] })

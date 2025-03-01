@@ -12,7 +12,7 @@ TARGET_PACKAGE = pa_ppx_fmtformat_runtime
 
 ML = pa_ppx_fmtformat_runtime.ml
 TOOLSML = mk_meta.ml
-MLI := 
+MLI := pa_ppx_fmtformat_runtime.mli
 ALLSRC=$(ML) $(MLI) $(TOOLSML)
 ALLPACKAGES=$(PACKAGES)
 TARGET_INSTALL_FILES=$(FILES_TARGET_INSTALL_FILES)
