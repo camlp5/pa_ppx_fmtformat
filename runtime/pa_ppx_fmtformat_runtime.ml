@@ -18,6 +18,10 @@ module Pfmt = struct
   type 'a t = out_channel -> 'a -> unit
   let fprintf = Printf.fprintf
   let printf = Printf.printf
-  
+  let stdout = Stdlib.stdout
+  let stderr = Stdlib.stderr
+  let int oc n = fprintf oc "%d" n
+  let string oc n = output_string oc n
+  let parens pp1 oc x = fprintf oc "(%a)" pp1 x
 end
 

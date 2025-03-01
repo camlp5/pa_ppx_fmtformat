@@ -51,6 +51,8 @@ let test_sprintf ctxt =
   ; assert_equal "foo" {%sprintf|foo|}
   ; assert_equal "foo42" {%sprintf|foo$(42|%d)|}
   ; assert_equal "foo42(abc)" {%sprintf|foo$(42|int)$("abc"|parens string)|}
+  ; let sub = {%sub_sprintf|abc|} in
+    assert_equal "[abc]" {%sprintf|[${() | sub}]|}
 
 let suite = "Test pa_ppx_fmtformat" >::: [
       "str"   >:: test_str
