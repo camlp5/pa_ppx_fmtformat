@@ -6,6 +6,9 @@ module Sfmt :
     val int : int t
     val string : string t
     val parens : 'a t -> 'a t
+    val nop : unit t
+    val list : ?sep:unit t -> 'a t -> 'a list t
+    val const : 'a t -> 'a -> 'b t
   end
 module Pfmt :
   sig
@@ -18,4 +21,7 @@ module Pfmt :
     val int : int t
     val string : string t
     val parens : 'a t -> 'a t
+    val nop : unit t
+    val list : ?sep:unit t -> 'a t -> 'a list t
+    val const : 'a t -> 'a -> 'b t
   end

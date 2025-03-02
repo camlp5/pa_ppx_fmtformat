@@ -48,11 +48,14 @@ let test_location_accuracy ctxt =
 
 let test_sprintf ctxt =
   ()
-  ; assert_equal "foo" {%sprintf|foo|}
-  ; assert_equal "foo42" {%sprintf|foo$(42|%d)|}
-  ; assert_equal "foo42(abc)" {%sprintf|foo$(42|int)$("abc"|parens string)|}
+  ; assert_equal ~printer "foo" {%sprintf|foo|}
+  ; assert_equal ~printer "foo42" {%sprintf|foo$(42|%d)|}
+  ; assert_equal ~printer "foo42(abc)" {%sprintf|foo$(42|int)$("abc"|parens string)|}
+  ; assert_equal ~printer "foo" {%sprintf|foo${[]|list ~sep:(const string ",") int}|}
+  ; assert_equal ~printer "foo1" {%sprintf|foo${[1]|list ~sep:(const string ",") int}|}
+  ; assert_equal ~printer "foo1,2,3" {%sprintf|foo${[1;2;3]|list ~sep:(const string ",") int}|}
   ; let sub = {%sub_sprintf|abc|} in
-    assert_equal "[abc]" {%sprintf|[${() | sub}]|}
+    assert_equal ~printer "[abc]" {%sprintf|[${() | sub}]|}
 
 let with_tmp_channel f =
   Bos.OS.File.with_tmp_oc ~dir:(Fpath.v "_build") "printf-test-%s.tex"
@@ -64,9 +67,12 @@ let with_tmp_channel f =
 let test_fprintf ctxt =
   ()
   ; assert_equal ~printer "abc" (with_tmp_channel {%fprintf|abc|})
-  ; assert_equal "foo42(abc)" (with_tmp_channel {%fprintf|foo$(42|int)$("abc"|parens string)|})
+  ; assert_equal ~printer "foo42(abc)" (with_tmp_channel {%fprintf|foo$(42|int)$("abc"|parens string)|})
+  ; assert_equal ~printer "foo" (with_tmp_channel {%fprintf|foo${[]|list ~sep:(const string ",") int}|})
+  ; assert_equal ~printer "foo1" (with_tmp_channel {%fprintf|foo${[1]|list ~sep:(const string ",") int}|})
+  ; assert_equal ~printer "foo1,2,3" (with_tmp_channel {%fprintf|foo${[1;2;3]|list ~sep:(const string ",") int}|})
   ; let sub = {%sub_fprintf|abc|} in
-    assert_equal "[abc]" (with_tmp_channel {%fprintf|[${() | sub}]|})
+    assert_equal ~printer "[abc]" (with_tmp_channel {%fprintf|[${() | sub}]|})
 
 let suite = "Test pa_ppx_fmtformat" >::: [
       "str"   >:: test_str
