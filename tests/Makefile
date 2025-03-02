@@ -2,7 +2,7 @@ WD=$(shell pwd)
 TOP=..
 include $(TOP)/config/Makefile.sub
 
-PACKAGES := $(PACKAGES),pa_ppx_fmtformat,ounit2,pa_ppx.utils,pa_ppx_fmtformat.link,pa_ppx.testutils,pp-binary-ints
+PACKAGES := $(PACKAGES),pa_ppx_fmtformat,ounit2,pa_ppx.utils,pa_ppx_fmtformat.link,pa_ppx.testutils,pp-binary-ints,bos
 
 ML= \
 	pa_ppx_fmtformat_test.ml \

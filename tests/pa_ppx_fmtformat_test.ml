@@ -1,4 +1,4 @@
-(**pp -syntax camlp5o -package pa_ppx_fmtformat *)
+(**pp -syntax camlp5o -package pa_ppx_fmtformat,bos *)
 open OUnit2
 open Pa_ppx_testutils
 open Pa_ppx_fmtformat
@@ -54,12 +54,27 @@ let test_sprintf ctxt =
   ; let sub = {%sub_sprintf|abc|} in
     assert_equal "[abc]" {%sprintf|[${() | sub}]|}
 
+let with_tmp_channel f =
+  Bos.OS.File.with_tmp_oc ~dir:(Fpath.v "_build") "printf-test-%s.tex"
+    (fun fp oc () ->
+      f oc ;
+      flush oc ;
+      Bos.OS.File.read fp |> Result.get_ok) () |> Result.get_ok
+
+let test_fprintf ctxt =
+  ()
+  ; assert_equal ~printer "abc" (with_tmp_channel {%fprintf|abc|})
+  ; assert_equal "foo42(abc)" (with_tmp_channel {%fprintf|foo$(42|int)$("abc"|parens string)|})
+  ; let sub = {%sub_fprintf|abc|} in
+    assert_equal "[abc]" (with_tmp_channel {%fprintf|[${() | sub}]|})
+
 let suite = "Test pa_ppx_fmtformat" >::: [
       "str"   >:: test_str
     ; "pf"   >:: test_pf
     ; "dollar"   >:: test_dollar
     ; "location accuracy"   >:: test_location_accuracy
     ; "test sprintf" >:: test_sprintf
+    ; "test fprintf" >:: test_fprintf
     ]
 
 let _ = 
