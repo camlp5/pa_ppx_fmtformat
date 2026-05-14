@@ -18,15 +18,15 @@ doc: "https://github.com/camlp5/pa_ppx_fmtformat/doc"
 depends: [
   "ocaml"       { >= "4.10.0" }
   "camlp5-buildscripts" { >= "0.02" }
-  "camlp5"      { >= "8.01.00" }
+  "camlp5"      { >= "8.05.01" }
   "pcre2" { >= "8.0.3" }
-  "pa_ppx"      { >= "0.12" }
+  "pa_ppx"      { >= "8.05.01" }
   "not-ocamlfind" { >= "0.13" }
   "ounit" { >= "2.2.7" }
   "fmt"
   "mdx" { >= "2.3.0" & with-test}
   "pp-binary-ints" {with-test}
-  "pa_ppx_regexp" { >= "0.04" }
+  "pa_ppx_regexp" { >= "8.05.01" }
 ]
 build: [
   [make "DEBUG=-g" "sys"]
