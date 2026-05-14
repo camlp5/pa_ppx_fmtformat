@@ -1,5 +1,5 @@
-`pa_ppx_fmtformat version 0.01`: `Fmt`-based string-interpolation
-=================================================================
+`pa_ppx_fmtformat version 8.05.01`: `Fmt`-based string-interpolation
+====================================================================
 :toc:
 :toc-placement: preamble
 

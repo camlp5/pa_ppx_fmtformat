@@ -1,3 +1,11 @@
+pa_ppx_fmtformat Version 8.05.01
+-------------------------------
+
+* [14 May 2026]
+
+  * bump version compat with camlp5 8.05.01
+
+  * sync config/Makefile*
 
 pa_ppx_fmtformat Version 0.01
 -----------------------------
