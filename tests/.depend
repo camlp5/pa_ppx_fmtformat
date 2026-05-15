@@ -1,9 +1,5 @@
-ppx_regexp.cmo ya_wrap_ocamlfind.cmo join_meta.cmo syntax_test.cmo ppx_regexp.exe syntax_test.exe ya-wrap-ocamlfind join_meta: ../local-install/lib/pa_ppx_regexp/META
-join_meta.cmo :
-join_meta.cmx :
-ppx_regexp.cmo :
-ppx_regexp.cmx :
-syntax_test.cmo :
-syntax_test.cmx :
-ya_wrap_ocamlfind.cmo :
-ya_wrap_ocamlfind.cmx :
+pa_ppx_fmtformat_test.cmo machinery_test.cmo pa_ppx_fmtformat_test.cmi machinery_test.cmi pa_ppx_fmtformat_test.cmx machinery_test.cmx: ../local-install/lib/pa_ppx_fmtformat/META ../local-install/lib/pa_ppx_fmtformat/META
+pa_ppx_fmtformat_test.cmo :
+pa_ppx_fmtformat_test.cmx :
+machinery_test.cmo :
+machinery_test.cmx :
