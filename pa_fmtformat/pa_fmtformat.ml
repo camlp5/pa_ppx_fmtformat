@@ -1,4 +1,4 @@
-(**pp -syntax camlp5o -package pa_ppx_regexp *)
+(**pp -syntax camlp5o -package pa_ppx_regexp,camlp5.extfun,camlp5.parser_quotations *)
 (* camlp5o *)
 (* pa_string.ml,v *)
 (* Copyright (c) INRIA 2007-2017 *)
@@ -52,7 +52,7 @@ let eval_anti entry loc typ str : Ploc.t * MLast.expr =
   in
   let r =
     try
-      Ploc.call_with Plexer.force_antiquot_loc false
+      Ploc.call_with Pcaml.Lexer.force_antiquot_loc false
         do_parse_expr str
     with
     Ploc.Exc(loc1, exc) ->
