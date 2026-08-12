@@ -1,4 +1,4 @@
-version: "8.05.01"
+version: "8.05.02"
 synopsis: "A Camlp5 PPX Rewriter for interpolation into strings (based on fmt) "
 description:
 """

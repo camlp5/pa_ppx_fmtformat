@@ -72,7 +72,14 @@ let eval_anti entry loc typ str : Ploc.t * MLast.expr =
 let reloc_to_subloc ~enclosed subloc =
   Ploc.(sub enclosed (first_pos subloc) (last_pos subloc))
 
+let unescape loc str =
+  try
+    Scanf.unescaped str
+  with ex ->
+        Ploc.raise loc ex
+
 let parse_expr loc str =
+  let str = unescape loc str in
   let (_,e) = eval_anti Pcaml.expr_eoi loc "" str in
   let shift = 0 in
   Reloc.expr (fun subloc -> reloc_to_subloc ~enclosed:loc subloc) shift e
@@ -100,7 +107,7 @@ let fmt_str_expr_of_template loc t =
 let rewrite_fmt_str arg = function
   <:expr< [%fmt_str $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
-   fmt_str_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+   fmt_str_expr_of_template loc (s |> template_of_string loc)
 
 | _ -> assert false
 
@@ -113,7 +120,7 @@ let fmt_pf_expr_of_template loc t =
 let rewrite_fmt_pf arg = function
   <:expr< [%fmt_pf $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
-   fmt_pf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+   fmt_pf_expr_of_template loc (s |> template_of_string loc)
 
 | _ -> assert false
 
@@ -126,7 +133,7 @@ let sprintf_expr_of_template loc t =
 let rewrite_sprintf arg = function
   <:expr< [%sprintf $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
-   sprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+   sprintf_expr_of_template loc (s |> template_of_string loc)
 
 | _ -> assert false
 
@@ -139,7 +146,7 @@ let fprintf_expr_of_template loc t =
 let rewrite_fprintf arg = function
   <:expr< [%fprintf $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
-   fprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+   fprintf_expr_of_template loc (s |> template_of_string loc)
 
 | _ -> assert false
 
@@ -152,7 +159,7 @@ let printf_expr_of_template loc t =
 let rewrite_printf arg = function
   <:expr< [%printf $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
-   printf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+   printf_expr_of_template loc (s |> template_of_string loc)
 
 | _ -> assert false
 
@@ -165,7 +172,7 @@ let sub_sprintf_expr_of_template loc t =
 let rewrite_sub_sprintf arg = function
   <:expr< [%sub_sprintf $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
-   sub_sprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+   sub_sprintf_expr_of_template loc (s |> template_of_string loc)
 
 | _ -> assert false
 
@@ -178,7 +185,7 @@ let sub_fprintf_expr_of_template loc t =
 let rewrite_sub_fprintf arg = function
   <:expr< [%sub_fprintf $exp:e$ ] >> ->
    let (loc, s) = match e with <:expr< $locstr:(loc,s)$ >> -> (loc, Pcaml.unvala s) in
-   sub_fprintf_expr_of_template loc (s |> Scanf.unescaped |> template_of_string loc)
+   sub_fprintf_expr_of_template loc (s |> template_of_string loc)
 
 | _ -> assert false
 

@@ -33,7 +33,14 @@ open PAPR ;;
 open Pa_ppx_fmtformat ;;
 open Pa_fmtformat ;;
 
-{foo| {%fmt_str|a b c $(|")"|string|) d e f|} |foo} |> Stream.of_string |> Implem.pa |> Implem.pr |> print_string ;;
+#trace template_of_string ;;
+#trace format_string_of_template;;
+#trace parse_expr;;
+{foo| {%fmt_str|\n|} |foo} |> Stream.of_string |> Implem.pa |> Implem.pr |> print_string ;;
+
+{foo| {%fmt_str|a b c $("argle") d e f|} |foo} |> Stream.of_string |> Implem.pa |> Implem.pr |> print_string ;;
+
+{foo| {%fmt_str|a b c $({bar|\n|bar}) d e f|} |foo} |> Stream.of_string |> Implem.pa |> Implem.pr |> print_string ;;
 
 (*
 ;;; Local Variables: ***

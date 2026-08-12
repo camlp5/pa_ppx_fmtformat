@@ -1,3 +1,12 @@
+pa_ppx_fmtformat Version 8.05.02
+--------------------------------
+
+* [12 Aug 2026]
+
+  * fix a bug in handling of escapes.  Previosuly, "\n" in a
+    raw-string was unescaped, which is wrong -- in a raw-string, it
+    isn't an escape.  Fix that.
+
 pa_ppx_fmtformat Version 8.05.01
 -------------------------------
 
