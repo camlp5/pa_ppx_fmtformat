@@ -38,6 +38,6 @@ Error: Unbound value c
 Line 1, characters 19-20:
 Error: Unbound value c
 # {%fmt_str|a b c $(|"foo" | (a b) |) d e f|} ;;
-Line 1, characters 29-31:
+Line 1, characters 31-33:
 Error: Unbound value a
 ```
